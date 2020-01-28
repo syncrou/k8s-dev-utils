@@ -1,3 +1,8 @@
+### Prerequisites
+- oc
+- jq
+- kubectl
+
 ## Steps to set up your own env on dev ocp (likely to change):
 
 1) create namespace `oc new-project my-project`

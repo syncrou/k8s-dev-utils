@@ -76,7 +76,7 @@ spec:
           value: dbomhof@redhat.com
         - name: DEV_PASSWORD
           value: redhat
-        image: docker-registry.default.svc:5000/jl-catalog/catalog-api:latest
+        image: docker-registry.default.svc:5000/buildfactory/catalog-api:latest
         imagePullPolicy: Always
         name: catalog-api
         ports:
