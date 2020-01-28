@@ -1,0 +1,108 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+  creationTimestamp: null
+  generation: 1
+  labels:
+    app: catalog
+  name: catalog-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    name: catalog-api
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: catalog
+        name: catalog-api
+      name: catalog-api
+    spec:
+      containers:
+      - args:
+        - -c
+        - "RAILS_ENV=development \
+           DATABASE_URL=postgres://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/catalog_production \
+           /usr/local/bin/bundle exec rails server"
+        command:
+        - /usr/bin/bash
+        env:
+        - name: APP_NAME
+          value: catalog
+        - name: PATH_PREFIX
+          value: api
+        - name: APPROVAL_URL
+          value: http://approval-api.approval-ci.svc:8080
+        - name: DATABASE_HOST
+          value: catalog-postgresql.catalog-ci.svc
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: catalog-db
+        - name: DATABASE_PORT
+          value: "5432"
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: catalog-db
+        - name: PGSSLMODE
+          value: prefer
+        - name: TOPOLOGICAL_INVENTORY_URL
+          value: http://topological-inventory-api.topological-inventory-ci.svc:8080
+        - name: QUEUE_HOST
+          value: platform-mq-ci-kafka-bootstrap.platform-mq-ci.svc
+        - name: QUEUE_PORT
+          value: "9092"
+        - name: RBAC_URL
+          value: http://rbac.rbac-ci.svc:8080
+        - name: SOURCES_URL
+          value: http://sources-api.sources-ci.svc:8080
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        - name: DEV_USERNAME
+          value: dbomhof@redhat.com
+        - name: DEV_PASSWORD
+          value: redhat
+        image: docker-registry.default.svc:5000/jl-catalog/catalog-api:latest
+        imagePullPolicy: Always
+        name: catalog-api
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        stdin: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0

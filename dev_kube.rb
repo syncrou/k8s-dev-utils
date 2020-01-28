@@ -21,7 +21,7 @@ config = Kubeclient::Config.read(
 )
 
 pod = @kube.get_pods(
-  namespace: namespace, label_selector: "run=#{svc}"
+  namespace: namespace, label_selector: "app=#{svc}"
 ).first.metadata.name
 
 puts('syncing...')
