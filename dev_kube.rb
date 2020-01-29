@@ -1,6 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'rubygems'
+require 'bundler/setup'
+
+Bundler.require
+
 require 'kubeclient'
 require 'filewatcher'
 

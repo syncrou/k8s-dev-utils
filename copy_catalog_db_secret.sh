@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source requires.sh
+
 RUNNER=kubectl
 
 # copy the catalog-db secret into the current namespace
