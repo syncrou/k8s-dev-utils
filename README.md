@@ -7,14 +7,15 @@
 
 1) create namespace `oc new-project my-project`
 2) import catalog-db secret `./copy_catalog_db_secret.sh`
-3) create your build(s) for catalog and minion, speicifying the repo/branch `./create_build.rb --repo https://github.com/myuser/catalog-api --branch my-branch` (this defaults to insights catalog-api and master)
+3) create your build(s) for catalog and minion, specifying the repo/branch `./create_build.rb --repo https://github.com/myuser/catalog-api --branch my-branch` (this defaults to insights catalog-api and master)
 4) create the deployment and service for catalog `oc create -f ./catalog.yml`
 5) create the minions `oc create -f ./minions.yml`
 
 ### At this point the application should be up and running after the build completes and the deployment picks it up and runs the pod
 
 To get to the application, since there isn't a way to get to the pod (ie no 3scale forwarding) the best way is to forward traffic from your local into the pod:
-`oc port-forward pod/catalog-api-#-adsfa 3000` which forward localhost:3000 -> pod:3000
+`oc port-forward pod/catalog-api-#-adsfa 3000` which forwards localhost:3000 -> pod:3000
+If you need to port forward to another internal port `oc port-forward pod/catalog-api-#-adsfa 5000:3000` which forwards localhost:5000 -> pod:3000
 After this, you can "attach" to the console and use `binding.irb` to debug in the application just like it was running locally:
 `oc attach -it pod/catalog-api-#-adsfad`
 
