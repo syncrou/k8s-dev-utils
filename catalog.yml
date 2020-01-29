@@ -34,7 +34,7 @@ spec:
         - -c
         - "RAILS_ENV=development \
            DATABASE_URL=postgres://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/catalog_production \
-           /usr/local/bin/bundle exec rails server"
+           /usr/local/bin/bundle exec rails server --binding=0.0.0.0"
         command:
         - /usr/bin/bash
         env:
@@ -113,16 +113,15 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: catalog-api
+    app: catalog
   name: catalog-api
 spec:
   ports:
-  - name: "3000"
-    port: 3000
+  - port: 3000
     protocol: TCP
     targetPort: 3000
   selector:
-    app: catalog-api
+    name: catalog-api
   sessionAffinity: None
   type: ClusterIP
 status:
