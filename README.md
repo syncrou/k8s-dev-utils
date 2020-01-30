@@ -5,17 +5,25 @@
 
 ## Steps to set up your own env on dev ocp (likely to change):
 
-1) create namespace `oc new-project my-project`
-2) import catalog-db secret `./copy_catalog_db_secret.sh`
-3) create your build(s) for catalog and minion, specifying the repo/branch `./create_build.rb --repo https://github.com/myuser/catalog-api --branch my-branch` (this defaults to insights catalog-api and master)
-4) create the deployment and service for catalog `oc create -f ./catalog.yml`
-5) create the minions `oc create -f ./minions.yml`
+-  create namespace `oc new-project my-project`
+- import catalog-db secret `./copy_catalog_db_secret.sh`
+- create your build(s) for catalog and minion, specifying the repo/branch `./create_build.rb --repo https://github.com/myuser/catalog-api --branch my-branch` (this defaults to insights catalog-api and master)
+- create your db
+- Edit catalog.yml; set the image line to use your build (image line, line 97 replace `buildfactory` with your namespace)
+- Edit catalog.yml; set the IMPORT_CI_DB initContainer ENV var to false if you would like to run with a pristine container, otherwise it will import the database from CI.
+- create the deployment and service for catalog `oc create -f ./catalog.yml`
+- create the minions `oc create -f ./minions.yml`
 
 ### At this point the application should be up and running after the build completes and the deployment picks it up and runs the pod
 
 To get to the application, since there isn't a way to get to the pod (ie no 3scale forwarding) the best way is to forward traffic from your local into the pod:
-`oc port-forward pod/catalog-api-#-adsfa 3000` which forwards localhost:3000 -> pod:3000
-If you need to port forward to another internal port `oc port-forward pod/catalog-api-#-adsfa 5000:3000` which forwards localhost:5000 -> pod:3000
+`oc port-forward pod/catalog-api-#-adsfa 3000` 
+which forwards localhost:3000 -> pod:3000
+
+If you need to port forward to another internal port 
+`oc port-forward pod/catalog-api-#-adsfa 5000:3000` 
+which forwards localhost:5000 -> pod:3000
+
 After this, you can "attach" to the console and use `binding.irb` to debug in the application just like it was running locally:
 `oc attach -it pod/catalog-api-#-adsfad`
 
