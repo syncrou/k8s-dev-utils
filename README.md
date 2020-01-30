@@ -5,12 +5,13 @@
 
 ## Steps to set up your own env on dev ocp (likely to change):
 
--  create namespace `oc new-project my-project`
+- create namespace `oc new-project my-project`
 - import catalog-db secret `./copy_catalog_db_secret.sh`
-- create your build(s) for catalog and minion, specifying the repo/branch `./create_build.rb --repo https://github.com/myuser/catalog-api --branch my-branch` (this defaults to insights catalog-api and master)
-- create your db
-- Edit catalog.yml; set the image line to use your build (image line, line 97 replace `buildfactory` with your namespace)
-- Edit catalog.yml; set the IMPORT_CI_DB initContainer ENV var to false if you would like to run with a pristine container, otherwise it will import the database from CI.
+- create the postgresql deployment and service, `oc create -f ./database.yml`
+- prepare the catalog build files
+  - create your build(s) for catalog and minion, specifying the repo/branch `./create_build.rb --repo https://github.com/myuser/catalog-api --branch my-branch` (this defaults to insights catalog-api and master)
+  - Edit catalog.yml; set the image line to use your build (image line, line 97 replace `buildfactory` with your namespace)
+  - Edit catalog.yml; set the `IMPORT_CI_DB` initContainer ENV var to false if you would like to run with a pristine container, otherwise it will import the database from CI.
 - create the deployment and service for catalog `oc create -f ./catalog.yml`
 - create the minions `oc create -f ./minions.yml`
 
