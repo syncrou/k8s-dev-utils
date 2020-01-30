@@ -18,15 +18,15 @@
 ### At this point the application should be up and running after the build completes and the deployment picks it up and runs the pod
 
 To get to the application, since there isn't a way to get to the pod (ie no 3scale forwarding) the best way is to forward traffic from your local into the pod:
-`oc port-forward pod/catalog-api-#-adsfa 3000` 
+`oc port-forward pod/catalog-dev-api-#-adsfa 3000` 
 which forwards localhost:3000 -> pod:3000
 
 If you need to port forward to another internal port 
-`oc port-forward pod/catalog-api-#-adsfa 5000:3000` 
+`oc port-forward pod/catalog-dev-api-#-adsfa 5000:3000` 
 which forwards localhost:5000 -> pod:3000
 
 After this, you can "attach" to the console and use `binding.irb` to debug in the application just like it was running locally:
-`oc attach -it pod/catalog-api-#-adsfad`
+`oc attach -it pod/catalog-dev-api-#-adsfad`
 
 It won't have byebug/pry by default, but if you check that into your branch it will build with all of the debugging utilities at your disposal.
 

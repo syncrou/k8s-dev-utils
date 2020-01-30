@@ -5,13 +5,13 @@ metadata:
   creationTimestamp: null
   generation: 1
   labels:
-    app: catalog-api
-  name: catalog-api-minion-approval
+    app: catalog-dev-api
+  name: catalog-dev-api-minion-approval
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    name: catalog-api-minion-approval
+    name: catalog-dev-api-minion-approval
   strategy:
     activeDeadlineSeconds: 21600
     resources: {}
@@ -26,9 +26,9 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: catalog-api
-        name: catalog-api-minion-approval
-      name: catalog-api-minion-approval
+        app: catalog-dev-api
+        name: catalog-dev-api-minion-approval
+      name: catalog-dev-api-minion-approval
     spec:
       containers:
       - command:
@@ -37,7 +37,7 @@ spec:
         - name: QUEUE_HOST
           value: platform-mq-ci-kafka-bootstrap.platform-mq-ci.svc
         - name: CATALOG_HOST
-          value: catalog-api
+          value: catalog-dev-api
         - name: CATALOG_PORT
           value: "3000"
         - name: CATALOG_SCHEME
@@ -48,7 +48,7 @@ spec:
           value: test-approval-persist-ref
         image: docker-registry.default.svc:5000/buildfactory/catalog-api-minion:latest
         imagePullPolicy: Always
-        name: catalog-api-minion-approval
+        name: catalog-dev-api-minion-approval
         resources:
           limits:
             cpu: 100m
@@ -80,13 +80,13 @@ metadata:
   creationTimestamp: null
   generation: 1
   labels:
-    app: catalog-api
-  name: catalog-api-minion-task
+    app: catalog-dev-api
+  name: catalog-dev-api-minion-task
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    name: catalog-api-minion-task
+    name: catalog-dev-api-minion-task
   strategy:
     activeDeadlineSeconds: 21600
     resources: {}
@@ -101,9 +101,9 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        app: catalog-api
-        name: catalog-api-minion-task
-      name: catalog-api-minion-task
+        app: catalog-dev-api
+        name: catalog-dev-api-minion-task
+      name: catalog-dev-api-minion-task
     spec:
       containers:
       - command:
@@ -112,7 +112,7 @@ spec:
         - name: QUEUE_HOST
           value: platform-mq-ci-kafka-bootstrap.platform-mq-ci.svc
         - name: CATALOG_HOST
-          value: catalog-api
+          value: catalog-dev-api
         - name: CATALOG_PORT
           value: "3000"
         - name: CATALOG_SCHEME
@@ -123,7 +123,7 @@ spec:
           value: test-task-persist-ref
         image: docker-registry.default.svc:5000/buildfactory/catalog-api-minion:latest
         imagePullPolicy: Always
-        name: catalog-api-minion-task
+        name: catalog-dev-api-minion-task
         resources:
           limits:
             cpu: 100m

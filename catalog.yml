@@ -5,13 +5,13 @@ metadata:
   creationTimestamp: null
   generation: 1
   labels:
-    app: catalog
-  name: catalog-api
+    app: catalog-dev
+  name: catalog-dev-api
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    name: catalog-api
+    name: catalog-dev-api
   strategy:
     activeDeadlineSeconds: 21600
     resources: {}
@@ -25,9 +25,9 @@ spec:
   template:
     metadata:
       labels:
-        app: catalog
-        name: catalog-api
-      name: catalog-api
+        app: catalog-dev
+        name: catalog-dev-api
+      name: catalog-dev-api
     spec:
       initContainers:
       - image: docker.io/centos/postgresql-10-centos7:latest
@@ -96,7 +96,7 @@ spec:
           value: redhat
         image: docker-registry.default.svc:5000/buildfactory/catalog-api:latest
         imagePullPolicy: Always
-        name: catalog-api
+        name: catalog-dev-api
         ports:
         - containerPort: 3000
           protocol: TCP
@@ -131,15 +131,15 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: catalog
-  name: catalog-api
+    app: catalog-dev
+  name: catalog-dev-api
 spec:
   ports:
   - port: 3000
     protocol: TCP
     targetPort: 3000
   selector:
-    name: catalog-api
+    name: catalog-dev-api
   sessionAffinity: None
   type: ClusterIP
 status:
