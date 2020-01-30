@@ -29,35 +29,53 @@ spec:
         name: catalog-api
       name: catalog-api
     spec:
+      initContainers:
+      - image: docker.io/centos/postgresql-10-centos7:latest
+        name: catalog-db-seed
+        command:
+        - /usr/bin/bash
+        args:
+        - -c
+        - "if [[ $IMPORT_CI_DB == \"true\" ]]; then
+             PGPASSWORD=$CI_PASSWORD /opt/rh/rh-postgresql10/root/usr/bin/pg_dump -U $CI_USER -h $CI_HOST catalog_production --clean > /tmp/pg_dump.sql && \
+             PGPASSWORD=toor /opt/rh/rh-postgresql10/root/bin/psql --user=root --host=postgresql catalog_development < /tmp/pg_dump.sql && \
+             rm /tmp/pg_dump.sql ;
+           else
+             echo \"Not importing DB since IMPORT_CI_DB is not set to true\";
+           fi"
+        env:
+        - name: IMPORT_CI_DB
+          value: "true"
+        - name: CI_HOST
+          value: catalog-postgresql.catalog-ci.svc
+        - name: CI_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: catalog-db
+        - name: CI_USER
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: catalog-db
       containers:
       - args:
         - -c
-        - "RAILS_ENV=development \
-           DATABASE_URL=postgres://$DATABASE_USER:$DATABASE_PASSWORD@$DATABASE_HOST:$DATABASE_PORT/catalog_production \
+        - "/usr/local/bin/bundle exec rake db:migrate && \
            /usr/local/bin/bundle exec rails server --binding=0.0.0.0"
         command:
         - /usr/bin/bash
         env:
+        - name: RAILS_ENV
+          value: development
+        - name: DATABASE_URL
+          value: postgres://root:toor@postgresql:5432/catalog_development
         - name: APP_NAME
           value: catalog
         - name: PATH_PREFIX
           value: api
         - name: APPROVAL_URL
           value: http://approval-api.approval-ci.svc:8080
-        - name: DATABASE_HOST
-          value: catalog-postgresql.catalog-ci.svc
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: catalog-db
-        - name: DATABASE_PORT
-          value: "5432"
-        - name: DATABASE_USER
-          valueFrom:
-            secretKeyRef:
-              key: username
-              name: catalog-db
         - name: PGSSLMODE
           value: prefer
         - name: TOPOLOGICAL_INVENTORY_URL
