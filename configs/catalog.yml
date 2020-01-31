@@ -1,0 +1,126 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+  creationTimestamp: null
+  generation: 1
+  labels:
+    app: catalog-dev
+  name: catalog-dev-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    name: catalog-dev-api
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: catalog-dev
+        name: catalog-dev-api
+      name: catalog-dev-api
+    spec:
+      initContainers:
+      - image: docker.io/centos/postgresql-10-centos7:latest
+        name: catalog-db-seed
+        command:
+        - /usr/bin/bash
+        args:
+        - -c
+        - "if [[ $IMPORT_CI_DB == \"true\" ]]; then
+             PGPASSWORD=$CI_PASSWORD /opt/rh/rh-postgresql10/root/usr/bin/pg_dump -U $CI_USER -h $CI_HOST catalog_production --clean > /tmp/pg_dump.sql && \
+             PGPASSWORD=toor /opt/rh/rh-postgresql10/root/bin/psql --user=root --host=postgresql catalog_development < /tmp/pg_dump.sql && \
+             rm /tmp/pg_dump.sql ;
+           else
+             echo \"Not importing DB since IMPORT_CI_DB is not set to true\";
+           fi"
+        env:
+        - name: IMPORT_CI_DB
+          value: "true"
+        - name: CI_HOST
+          value: catalog-postgresql.catalog-ci.svc
+        - name: CI_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: catalog-db
+        - name: CI_USER
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: catalog-db
+      containers:
+      - args:
+        - -c
+        - "/usr/local/bin/bundle exec rake db:migrate && \
+           /usr/local/bin/bundle exec rails server --binding=0.0.0.0"
+        command:
+        - /usr/bin/bash
+        env:
+        - name: RAILS_ENV
+          value: development
+        - name: DATABASE_URL
+          value: postgres://root:toor@postgresql:5432/catalog_development
+        - name: APP_NAME
+          value: catalog
+        - name: PATH_PREFIX
+          value: api
+        - name: APPROVAL_URL
+          value: http://approval-api.approval-ci.svc:8080
+        - name: PGSSLMODE
+          value: prefer
+        - name: TOPOLOGICAL_INVENTORY_URL
+          value: http://topological-inventory-api.topological-inventory-ci.svc:8080
+        - name: QUEUE_HOST
+          value: platform-mq-ci-kafka-bootstrap.platform-mq-ci.svc
+        - name: QUEUE_PORT
+          value: "9092"
+        - name: RBAC_URL
+          value: http://rbac.rbac-ci.svc:8080
+        - name: SOURCES_URL
+          value: http://sources-api.sources-ci.svc:8080
+        - name: RAILS_LOG_TO_STDOUT
+          value: "true"
+        - name: DEV_USERNAME
+          value: dbomhof@redhat.com
+        - name: DEV_PASSWORD
+          value: redhat
+        image: docker-registry.default.svc:5000/buildfactory/catalog-api:latest
+        imagePullPolicy: Always
+        name: catalog-dev-api
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        stdin: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+status:
+  availableReplicas: 0
+  latestVersion: 0
+  observedGeneration: 0
+  replicas: 0
+  unavailableReplicas: 0
+  updatedReplicas: 0
