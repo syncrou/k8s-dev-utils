@@ -12,6 +12,8 @@ opts = Optimist.options do
   opt :branch, 'push after building', default: 'master'
   opt :namespace, 'not catalog-ci', type: :string, default: "my-namespace-#{rand(100)}"
 end
+
+
 if opts[:namespace] == 'catalog-ci'
   puts "Cannot do work on the existing catalog-ci namespace"
   exit
@@ -19,6 +21,10 @@ end
 
 puts("Building env for namespace #{opts[:namespace]}...")
 system("oc new-project #{opts[:namespace]}")
+#
+# Write the namespace to a file
+file = File.join(File.dirname(__FILE__), ".namespace.txt")
+File.open(file, 'w') { |f| f.puts "#{opts[:namespace]}"}
 
 puts "Importing secret from catalog-ci db"
 system("./copy_catalog_db_secret.sh")
