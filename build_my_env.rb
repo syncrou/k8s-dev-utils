@@ -44,3 +44,9 @@ File.open("configs/catalog-custom.yml", 'w') { |f| YAML.dump(catalog, f) }
 puts "creating the deployment and service for catalog and the minions"
 system("oc create -f configs/catalog-custom.yml")
 system("oc create -f ./minions.yml")
+sleep(20)
+
+puts "Cleaning up the temp deployment files"
+File.delete("configs/catalog-custom.yml")
+
+puts "Done"

@@ -3,6 +3,24 @@
 - jq
 - kubectl
 
+## Quick start with a single script
+
+- Create a local namespace using repo `https://github.com/RedHatInsights/catalog-api' and branch 'master'
+```
+./build_my_env.rb
+```
+
+- Remove the built environment
+  - Removes the namespace ( unless the namespace is catalog-ci )
+```
+./remove_my_env.rb
+```
+
+- If you want pass options to the `build_my_env.rb` script
+```
+./build_my_env.rb --repo https://github.com/myuser/catalog-ap --branch my-branch --namespace my-namespace
+```
+
 ## Steps to set up your own env on dev ocp (likely to change):
 
 - create namespace `oc new-project my-project`
