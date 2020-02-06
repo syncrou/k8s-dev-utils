@@ -61,8 +61,8 @@ spec:
       containers:
       - args:
         - -c
-        - "/usr/local/bin/bundle exec rake db:migrate && \
-           /usr/local/bin/bundle exec rails server --binding=0.0.0.0"
+        - "bundle exec rake db:migrate && \
+           bundle exec rails server --binding=0.0.0.0"
         command:
         - /usr/bin/bash
         env:
