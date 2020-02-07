@@ -53,6 +53,7 @@ File.open("configs/task-minion-custom.yml", 'w') { |f| YAML.dump(task, f) }
 
 puts "creating the deployment and service for catalog and the minions"
 system("oc create -f configs/catalog-custom.yml")
+system("oc create -f configs/catalog-dev-service.yml")
 system("oc create -f configs/approval-minion-custom.yml")
 system("oc create -f configs/task-minion-custom.yml")
 sleep(20)
